@@ -1,0 +1,22 @@
+﻿Apollo Client:
+ npm i -S -E apollo-angular@1.1.1 apollo-angular-link-http@1.1.0 apollo-client@2.3.5 apollo-cache-inmemory@1.2.5 graphql-tag@2.9.2
+
+	
+
+
+https://github.com/graphql/graphql-js/releases => v0.13.3
+
+Se já tiver lançado a versão 0.13.3:
+ npm i -S -E graphql@0.13.3
+
+
+
+Se ainda não:
+ npm i -S graphql@git://github.com/graphql/graphql-js.git#npm
+
+
+
+
+
+Atualizar devkit:
+ npm i -D -E @angular-devkit/build-angular@0.6.3
