@@ -1,16 +1,22 @@
 import { AUTHENTICATE_USER_MUTATION, SIGNUP_USER_MUTATION } from './auth.graphql';
 import { Apollo } from 'apollo-angular';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  private _isAuthenticated = new ReplaySubject<boolean>(1);
+
   constructor(private apollo: Apollo) {
-    this.signupUser({name: 'Versailles', email: 'versailles@test.com', password: '123456'}).subscribe(res => console.log(res));
+    this.isAuthenticated.subscribe(is=> console.log('AuthState', is));
+   }
+
+   get isAuthenticated(): Observable<boolean> {
+     return this._isAuthenticated.asObservable();
    }
 
   signinUser(variables: {email: string, password: string}): Observable<{id:string, token:string}> {
@@ -18,7 +24,8 @@ export class AuthService {
       mutation: AUTHENTICATE_USER_MUTATION,
       variables
     }).pipe(
-      map (res=> res.data.authenticateUser)
+      map (res=> res.data.authenticateUser),
+      tap(res=> this.setAuthState(res !== null))
     );
   }
 
@@ -27,7 +34,12 @@ export class AuthService {
       mutation: SIGNUP_USER_MUTATION,
       variables
     }).pipe(
-      map (res=> res.data.signupUser)
+      map(res=> res.data.signupUser),
+      tap(res=> this.setAuthState(res !== null))
     );
+  }
+
+  private setAuthState(isAuthenticated:boolean): void {
+    this._isAuthenticated.next(isAuthenticated);
   }
 }

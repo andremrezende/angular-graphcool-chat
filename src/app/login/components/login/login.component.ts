@@ -1,12 +1,11 @@
 import { AuthService } from './../../../core/services/auth.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostBinding } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { FormBuilder, FormGroup, Validators, FormControl  } from '@angular/forms';
 import { takeWhile } from 'rxjs/operators';
 import { ErrorService } from '../../../core/services/error.service';
 
 @Component({
-  selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -24,6 +23,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   );
 
   private alive = true;
+
+  @HostBinding('class.app-login-spinner') private appltSpinnerClass = true;
 
   constructor(
     private authService: AuthService,
