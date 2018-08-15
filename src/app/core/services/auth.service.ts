@@ -1,8 +1,8 @@
 import { AUTHENTICATE_USER_MUTATION, SIGNUP_USER_MUTATION } from './auth.graphql';
 import { Apollo } from 'apollo-angular';
 import { Injectable } from '@angular/core';
-import { map, tap } from 'rxjs/operators';
-import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { Observable, ReplaySubject, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,11 @@ export class AuthService {
       variables
     }).pipe(
       map (res=> res.data.authenticateUser),
-      tap(res=> this.setAuthState(res !== null))
+      tap(res=> this.setAuthState(res !== null)),
+      catchError(err => {
+        this.setAuthState(false);
+        return throwError(err);
+      })
     );
   }
 
@@ -35,7 +39,11 @@ export class AuthService {
       variables
     }).pipe(
       map(res=> res.data.signupUser),
-      tap(res=> this.setAuthState(res !== null))
+      tap(res=> this.setAuthState(res !== null)),
+      catchError(err => {
+        this.setAuthState(false);
+        return throwError(err);
+      })
     );
   }
 
