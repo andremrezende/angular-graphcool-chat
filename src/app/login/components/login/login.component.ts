@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   @HostBinding('class.app-login-spinner') private appltSpinnerClass = true;
 
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
     private errorService: ErrorService,
     private formBuilder: FormBuilder,
     private snackBar:MatSnackBar
@@ -74,17 +74,22 @@ export class LoginComponent implements OnInit, OnDestroy {
     );                      
   }
 
+  
   changeAction(): void{  
     this.configs.isLogin = !this.configs.isLogin;
     this.configs.actionText = this.configs.isLogin ? 'SignUp' : 'SignIn';
     this.configs.buttonActionText = this.configs.isLogin ? 'Already have account' : 'Create account';
     !this.configs.isLogin ? this.loginForm.addControl('name', this.nameControl) : this.loginForm.removeControl('name');
   }
-
+  
   get email(): FormControl {return <FormControl>this.loginForm.get('email');}
   get password(): FormControl {return <FormControl>this.loginForm.get('password');}
   get name(): FormControl {return <FormControl>this.loginForm.get('name');}
-
+  
+  onKeepsigned():void {
+    this.authService.toggleKeepSigner();
+  }
+  
   ngOnDestroy():void {
     this.alive = false;
   }
