@@ -1,11 +1,12 @@
 import { environment } from "./../environments/environment";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, HttpHeaders } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { ApolloModule, Apollo } from "apollo-angular";
-import { ApolloLink } from "apollo-link";
+import { ApolloLink, Operation } from "apollo-link";
 import { HttpLinkModule, HttpLink } from "apollo-angular-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { onError } from "apollo-link-error";
+import { StorageKeys } from "./storage-keys";
 
 @NgModule({
   imports: [HttpClientModule, ApolloModule, HttpLinkModule]
@@ -16,15 +17,16 @@ export class ApolloConfigModule {
     const http = httpLink.create({
       uri: uri
     });
+    const authMiddleware: ApolloLink = new ApolloLink((operation: Operation, forward) => {
+      operation.setContext({
+        headers: new HttpHeaders({
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        })
+      });
+      return forward(operation);
+    });
 
     const linkError = onError(({ graphQLErrors, networkError }) => {
-      if (graphQLErrors) {
-        graphQLErrors.map(({ message, locations, path }) =>
-          console.log(
-            `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-          )
-        );
-      }
       if (networkError) {
         console.log(`[Network error]: ${networkError}`);
       }
@@ -32,10 +34,14 @@ export class ApolloConfigModule {
     apollo.create({
       link: ApolloLink.from([
         linkError,
-        http
+        authMiddleware.concat(http)
       ]),
       cache: new InMemoryCache(),
       connectToDevTools: !environment.production
     });
+  }
+
+  private getAuthToken(): string {
+    return window.localStorage.getItem(StorageKeys.AUTH_TOKEN);
   }
 }

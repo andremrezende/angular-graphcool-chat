@@ -1,7 +1,9 @@
 import { StorageKeys } from "./../../storage-keys";
 import {
   AUTHENTICATE_USER_MUTATION,
-  SIGNUP_USER_MUTATION
+  SIGNUP_USER_MUTATION,
+  LoggedInUserQuery,
+  LOGGED_IN_USER_QUERY
 } from "./auth.graphql";
 import { Apollo } from "apollo-angular";
 import { Injectable } from "@angular/core";
@@ -19,6 +21,9 @@ export class AuthService {
   constructor(private apollo: Apollo) {
     this.isAuthenticated.subscribe(is => console.log("AuthState", is));
     this.init();
+    this.validateToken().subscribe(
+      res => console.log('Res', res),
+      err => console.log('Error: ', err));
   }
 
   init(): void {
@@ -81,6 +86,21 @@ export class AuthService {
   toggleKeepSigner(): void {
     this.keepSigned = !this.keepSigned;
     window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
+  }
+
+  private validateToken() : Observable<{id: string, isAuthenticated: boolean}> {
+    return this.apollo.query<LoggedInUserQuery>({
+      query: LOGGED_IN_USER_QUERY
+    }).pipe(
+      map( res => {
+        const user = res.data.loggedInUser;
+        return {
+          id: user && user.id,
+          isAuthenticated: user !== null
+        }
+      }
+      )
+    );
   }
 
   private setAuthState(authData: {
