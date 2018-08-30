@@ -7,8 +7,9 @@ import {
 } from "./auth.graphql";
 import { Apollo } from "apollo-angular";
 import { Injectable } from "@angular/core";
-import { catchError, map, tap } from "rxjs/operators";
-import { Observable, ReplaySubject, throwError } from "rxjs";
+import { catchError, map, tap, mergeMap } from "rxjs/operators";
+import { Observable, ReplaySubject, throwError, of } from "rxjs";
+import { Router } from "@angular/router";
 
 @Injectable({
   providedIn: "root"
@@ -18,7 +19,7 @@ export class AuthService {
   keepSigned: boolean;
   private _isAuthenticated = new ReplaySubject<boolean>(1);
 
-  constructor(private apollo: Apollo) {
+  constructor(private apollo: Apollo, private router:Router) {
     this.isAuthenticated.subscribe(is => console.log("AuthState", is));
     this.init();
     this.validateToken().subscribe(
@@ -86,6 +87,38 @@ export class AuthService {
   toggleKeepSigner(): void {
     this.keepSigned = !this.keepSigned;
     window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
+  }
+
+  logout(): void {
+    window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
+    window.localStorage.removeItem(StorageKeys.KEEP_SIGNED);
+    this.keepSigned = false;
+    this._isAuthenticated.next(false);
+    this.router.navigate(['/login']);
+    this.apollo.getClient().resetStore();
+  }
+
+  autoLogin(): Observable<void> {
+    if(!this.keepSigned) {
+      this._isAuthenticated.next(false);
+      window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
+      return of();
+    } 
+    return this.validateToken().pipe( 
+      tap(authData => {
+        const token = window.localStorage.getItem(StorageKeys.AUTH_TOKEN);
+        this.setAuthState({
+          token, isAuthenticated: authData.isAuthenticated
+        });
+      }),
+      mergeMap(res => of()),
+      catchError(error => {
+        this.setAuthState({
+          token:null, isAuthenticated: false
+        })
+        return throwError(error);
+      })
+    );
   }
 
   private validateToken() : Observable<{id: string, isAuthenticated: boolean}> {
