@@ -17,6 +17,7 @@ import { Router } from "@angular/router";
 export class AuthService {
   retirectURL: string;
   keepSigned: boolean;
+  remeberMe: boolean;
   private _isAuthenticated = new ReplaySubject<boolean>(1);
 
   constructor(private apollo: Apollo, private router:Router) {
@@ -29,6 +30,7 @@ export class AuthService {
 
   init(): void {
     this.keepSigned = JSON.parse(window.localStorage.getItem(StorageKeys.KEEP_SIGNED));
+    this.remeberMe = JSON.parse(window.localStorage.getItem(StorageKeys.REMEMBER_ME));
   }
 
   get isAuthenticated(): Observable<boolean> {
@@ -87,6 +89,15 @@ export class AuthService {
   toggleKeepSigner(): void {
     this.keepSigned = !this.keepSigned;
     window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
+  }
+
+  toggleRememberMe(): void {
+    this.remeberMe = !this.remeberMe;
+    window.localStorage.setItem(StorageKeys.REMEMBER_ME, this.remeberMe.toString());
+    if(!this.remeberMe) {
+      window.localStorage.removeItem(StorageKeys.USER_EMAIL);
+      window.localStorage.removeItem(StorageKeys.USER_PASSWORD);
+    }
   }
 
   logout(): void {

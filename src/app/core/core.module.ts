@@ -7,7 +7,7 @@ import { ApolloConfigModule } from './../apollo-config.module';
  exports: [
   BrowserAnimationsModule, 
   ApolloConfigModule,
-  HttpClientModule
+  HttpClientModule,
  ]
 })
 export class CoreModule { 
