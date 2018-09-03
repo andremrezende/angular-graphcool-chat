@@ -10,6 +10,7 @@ import { Injectable } from "@angular/core";
 import { catchError, map, tap, mergeMap } from "rxjs/operators";
 import { Observable, ReplaySubject, throwError, of } from "rxjs";
 import { Router } from "@angular/router";
+import {Base64} from 'js-base64';
 
 @Injectable({
   providedIn: "root"
@@ -97,6 +98,23 @@ export class AuthService {
     if(!this.remeberMe) {
       window.localStorage.removeItem(StorageKeys.USER_EMAIL);
       window.localStorage.removeItem(StorageKeys.USER_PASSWORD);
+    }
+  }
+
+  setRememberMe(user: {email: string, password: string}): void {
+    if(this.remeberMe) {
+      window.localStorage.setItem(StorageKeys.USER_EMAIL, Base64.encode(user.email));
+      window.localStorage.setItem(StorageKeys.USER_PASSWORD, Base64.encode(user.password));
+    }
+  }
+
+  getRememberMe() : {email: string, password: string}  {
+    if(!this.remeberMe) {
+      return null;
+    }
+    return {
+      email: Base64.decode(window.localStorage.getItem(StorageKeys.USER_EMAIL)),
+      password:  Base64.decode(window.localStorage.getItem(StorageKeys.USER_PASSWORD))
     }
   }
 
