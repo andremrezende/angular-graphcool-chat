@@ -9,6 +9,7 @@ import {
 } from "@angular/forms";
 import { takeWhile } from "rxjs/operators";
 import { ErrorService } from "../../../core/services/error.service";
+import { Router } from "@angular/router";
 
 @Component({
   templateUrl: "./login.component.html",
@@ -37,6 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private errorService: ErrorService,
     private formBuilder: FormBuilder,
+    private router: Router,
     private snackBar: MatSnackBar
   ) {}
 
@@ -68,11 +70,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     operation.pipe(takeWhile(() => this.alive)).subscribe(
       res => {
-        console.log("redirecting....", res);
         this.authService.setRememberMe(this.loginForm.value);
         const redirect: string = this.authService.retirectURL || "//dashboard";
+        console.log("redirecting....", redirect);
+        this.router.navigate([redirect]);
         this.authService.retirectURL = null;
-        console.log("route to redirect", redirect);
         this.configs.isLoading = false;
       },
       err => {
