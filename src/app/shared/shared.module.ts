@@ -13,7 +13,8 @@ import {
   MatListModule,
   MatIconModule,
   MatLineModule,
-  MatSidenavModule
+  MatSidenavModule,
+  MatTabsModule
   } from '@angular/material';
 
 @NgModule({
@@ -30,6 +31,7 @@ import {
   MatSidenavModule,
   MatSnackBarModule,
   MatSlideToggleModule,
+  MatTabsModule,
   MatToolbarModule,
   ReactiveFormsModule
  ]

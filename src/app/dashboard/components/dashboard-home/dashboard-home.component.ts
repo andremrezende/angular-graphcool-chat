@@ -7,10 +7,9 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './dashboard-home.component.html',
   styleUrls: ['./dashboard-home.component.scss']
 })
-export class DashboardHomeComponent {
-  private authService: AuthService;
+export class DashboardHomeComponent {  
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   onLogout(sidenav: MatSidenav): void {
     sidenav.close().then(() => this.authService.logout());

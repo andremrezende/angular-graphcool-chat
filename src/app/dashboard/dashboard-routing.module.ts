@@ -5,18 +5,20 @@ import { DashboardHomeComponent } from "./components/dashboard-home/dashboard-ho
 import { DashboardResourcesComponent } from "./components/dashboard-resources/dashboard-resources.component";
 
 const routes: Routes = [
-  { path: "", 
-    component: DashboardHomeComponent, 
+  {
+    path: "",
+    component: DashboardHomeComponent,
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      {path: '', component: DashboardResourcesComponent}
+      { path: 'chat', loadChildren: './../chat/chat.module#ChatModule', canLoad: [AuthGuard] },
+      { path: '', component: DashboardResourcesComponent }
     ]
-   }
+  }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class DashboardRoutingModule {}
+export class DashboardRoutingModule { }
