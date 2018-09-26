@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NoRecordComponent } from './components/no-record/no-record.component';
 import {
   MatButtonModule,
   MatCardModule, 
@@ -18,6 +19,7 @@ import {
   } from '@angular/material';
 
 @NgModule({
+ imports: [MatIconModule], 
  exports: [
   CommonModule,
   MatButtonModule,
@@ -33,7 +35,9 @@ import {
   MatSlideToggleModule,
   MatTabsModule,
   MatToolbarModule,
+  NoRecordComponent,
   ReactiveFormsModule
- ]
+ ],
+ declarations: [NoRecordComponent]
 })
 export class SharedModule { }
