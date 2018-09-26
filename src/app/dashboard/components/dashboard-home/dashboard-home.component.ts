@@ -1,5 +1,5 @@
 import { Component} from '@angular/core';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav, MatDialog } from '@angular/material';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -9,7 +9,9 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class DashboardHomeComponent {  
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) { 
+      //super(authService, dialog);
+    }
 
   onLogout(sidenav: MatSidenav): void {
     sidenav.close().then(() => this.authService.logout());

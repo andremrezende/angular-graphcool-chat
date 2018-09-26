@@ -27,7 +27,7 @@ type Chat @model {
 type Message @model {
   id: ID! @isUnique
   text: String
-  createAt: DateTime!
+  createdAt: DateTime!
   sender: User! @relation(name: "MessagesOnUser")
   chat: Chat!  @relation(name: "MessagesOnChat")
 }

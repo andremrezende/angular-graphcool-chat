@@ -4,7 +4,7 @@
       Menu
     </mat-toolbar>
 
-    <app-dashboard-resources [isMenu]=true (close)="sidenav.close()">
+    <app-dashboard-resources [isMenu]="true" (close)="sidenav.close()">
       <mat-divider></mat-divider>
       <mat-list-item (click)="onLogout(sidenav)">
         <mat-icon matListIcon>arrow_forward</mat-icon>
