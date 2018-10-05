@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Chat } from '../models/chat.model';
 import { Apollo } from 'apollo-angular';
 import { AuthService } from '../../core/services/auth.service';
-import { AllChatsQuery, USER_CHATS_QUERY } from './chat.graphql';
+import { AllChatsQuery, USER_CHATS_QUERY, CREATE_PRIVATE_CHAT_MUTATION } from './chat.graphql';
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -18,8 +18,29 @@ export class ChatService {
       query: USER_CHATS_QUERY,
       variables: { userID: this.authService.authUser.id }
     }).pipe(
-      map(res => res.data.allChats)
-    )
+      map(res => res.data.allChats),
+      map((chats: Chat[]) => {
+        const chatsToSort = chats.slice();
+        return chatsToSort.sort((a, b) =>{
+          const valueA = (a.messages.length > 0) ? new Date(a.messages[0].createdAt).getTime() : new Date(a.createdAt).getTime();
+          const valueB = (b.messages.length > 0) ? new Date(b.messages[0].createdAt).getTime() : new Date(b.createdAt).getTime();
+
+          return valueB - valueA;
+        });
+      })
+    );
   }
 
+  createPrivateChat(targetUserId: string): Observable<Chat> {
+    return this.apollo.mutate({
+      mutation: CREATE_PRIVATE_CHAT_MUTATION,
+      variables: {
+        loggedUserId: this.authService.authUser.id,
+        targetUserId
+      }
+    }
+    ).pipe(
+      map(res => res.data.createChat)
+    );
+  }
 }
