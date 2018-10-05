@@ -87,7 +87,7 @@ export class ChatWindowComponent extends BaseComponent<Message> implements After
 
         this.newMessage = '';
       } else {
-        // this.createPrivateChat();
+        this.createPrivateChat();
       }
 
     }
@@ -108,16 +108,16 @@ export class ChatWindowComponent extends BaseComponent<Message> implements After
     );
   }
 
-  // private createPrivateChat(): void {
-  //   this.chatService.createPrivateChat(this.recipientId)
-  //     .pipe(
-  //       take(1),
-  //       tap((chat: Chat) => {
-  //         this.chat = chat;
-  //         this.sendMessage();
-  //       })
-  //     ).subscribe();
-  // }
+  private createPrivateChat(): void {
+    this.chatService.createPrivateChat(this.recipientId)
+      .pipe(
+        take(1),
+        tap((chat: Chat) => {
+          this.chat = chat;
+          this.sendMessage();
+        })
+      ).subscribe();
+  }
 
   private scrollToBottom(behavior: string = 'auto', block: string = 'end'): void {
     setTimeout(() => {
