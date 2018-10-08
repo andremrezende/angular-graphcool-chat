@@ -25,6 +25,11 @@ export class DashboardResourcesComponent implements OnInit {
       url: '/dashboard/chat',
       icon: 'chat_bubble',
       title: 'My Chats'
+    },
+    {
+      url: '/dashboard//users',
+      icon: 'people',
+      title: 'All Users'
     }
   ];
 
