@@ -18,6 +18,7 @@ import {
   MatTabsModule
 } from '@angular/material';
 import { AvatarComponent } from './components/avatar/avatar.component';
+import { FromNowPipe } from './pipes/from-now.pipe';
 
 @NgModule({
  imports: [CommonModule, MatIconModule], 
@@ -25,6 +26,7 @@ import { AvatarComponent } from './components/avatar/avatar.component';
   AvatarComponent,
   CommonModule,
   FormsModule,
+  FromNowPipe,
   MatButtonModule,
   MatCardModule,
   MatFormFieldModule,
@@ -41,6 +43,6 @@ import { AvatarComponent } from './components/avatar/avatar.component';
   NoRecordComponent,
   ReactiveFormsModule
  ],
- declarations: [AvatarComponent, NoRecordComponent]
+ declarations: [AvatarComponent, NoRecordComponent, FromNowPipe]
 })
 export class SharedModule { }
