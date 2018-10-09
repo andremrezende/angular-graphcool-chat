@@ -5,6 +5,23 @@ export interface AllMessagesQuery {
     allMessages: Message[];
 }
 
+const MessageFrament = gql `
+ fragment MessageFrament on Message {
+  id
+  text
+  createAt
+  sender {
+    id
+    name
+    email
+    createdAt
+  }
+  chat {
+    id
+  }
+ }
+`;
+
 export const GET_CHAT_MESSAGES_QUERY = gql`
 query GetChatMessagesQuery($chatId: ID!){
   allMessages (
@@ -15,20 +32,10 @@ query GetChatMessagesQuery($chatId: ID!){
     },
     orderBy: createAt_ASC
   ){
-    id
-    text
-    createAt
-    sender {
-      id
-      name
-      email
-      createdAt
-    }
-    chat {
-      id
-    }
+   ...MessageFrament
   }
 }
+${MessageFrament}
 `;
 
 export const CREATE_MESSAGE_MUTATION = gql`
@@ -39,18 +46,8 @@ mutation CreateMessageMutation($text:String!, $chatId: ID!, $senderId:ID!) {
     senderId: $senderId,
     createAt: "2015-11-22T13:57:31.123Z"
   ){
-    id
-    text
-    createAt
-    sender {
-      id
-      name
-      email
-      createdAt
-    }
-    chat {
-      id
-    }
+    ...MessageFrament
   }
 }
+${MessageFrament}
 `;

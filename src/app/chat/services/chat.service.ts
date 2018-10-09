@@ -16,7 +16,7 @@ export class ChatService {
   getUserChats(): Observable<Chat[]> {
     return this.apollo.query<AllChatsQuery>({
       query: USER_CHATS_QUERY,
-      variables: { userID: this.authService.authUser.id }
+      variables: { loggedUserId: this.authService.authUser.id }
     }).pipe(
       map(res => res.data.allChats),
       map((chats: Chat[]) => {
