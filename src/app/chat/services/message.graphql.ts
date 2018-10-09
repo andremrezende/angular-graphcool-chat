@@ -9,7 +9,7 @@ const MessageFrament = gql `
  fragment MessageFrament on Message {
   id
   text
-  createAt
+  createdAt
   sender {
     id
     name
