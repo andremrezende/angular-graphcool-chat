@@ -1,6 +1,6 @@
 import { InjectionToken } from "@angular/core";
 
-const graphcoolID = "";
+const graphcoolID = "cjjzmh11l3tp30148o00nco75";
 
 export interface GraphcoolConfig {
   simpleAPI: string;
