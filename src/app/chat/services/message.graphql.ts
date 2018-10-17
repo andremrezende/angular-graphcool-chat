@@ -5,7 +5,7 @@ export interface AllMessagesQuery {
     allMessages: Message[];
 }
 
-const MessageFrament = gql `
+const MessageFragment = gql `
  fragment MessageFrament on Message {
   id
   text
@@ -35,7 +35,7 @@ query GetChatMessagesQuery($chatId: ID!){
    ...MessageFrament
   }
 }
-${MessageFrament}
+${MessageFragment}
 `;
 
 export const CREATE_MESSAGE_MUTATION = gql`
@@ -49,5 +49,28 @@ mutation CreateMessageMutation($text:String!, $chatId: ID!, $senderId:ID!) {
     ...MessageFrament
   }
 }
-${MessageFrament}
+${MessageFragment}
+`;
+
+export const USER_MESSAGES_SUBSCRIPTION = gql`
+  subscription UserMessagesSubscription($loggedUserId: ID!) {
+    Message(
+      filter: {
+        mutation_in: [ CREATED ],
+        node: {
+          chat: {
+            users_some: {
+              id: $loggedUserId
+            }
+          }
+        }
+      }
+    ) {
+      mutation
+      node {
+        ...MessageFragment
+      }
+    }
+  }
+  ${MessageFragment}
 `;
