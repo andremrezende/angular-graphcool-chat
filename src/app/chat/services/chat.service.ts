@@ -265,3 +265,4 @@ export class ChatService extends BaseService {
       map(res => res.data.createChat)
     );
   }
+}
