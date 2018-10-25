@@ -118,16 +118,16 @@ export class ChatWindowComponent extends BaseComponent<Message> implements After
         })
       ).subscribe();
   }
+  
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(s => s.unsubscribe());
+    this.title.setTitle('Angular Graphcool Chat');
+  }
 
   private scrollToBottom(behavior: string = 'auto', block: string = 'end'): void {
     setTimeout(() => {
       this.content.nativeElement.scrollIntoView({ behavior, block });
     }, 0);
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(s => s.unsubscribe());
-    this.title.setTitle('Angular Graphcool Chat');
   }
 
 }

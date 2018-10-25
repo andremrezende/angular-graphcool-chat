@@ -1,3 +1,4 @@
+import { ChatService } from './../../services/chat.service';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -28,11 +29,10 @@ import { AuthService } from '../../../core/services/auth.service';
 export class ChatTabComponent implements OnInit {
 
   constructor(
-    private authService: AuthService,
-    private userService: UserService
+    private chatService: ChatService
   ) {}
 
   ngOnInit(): void {
-    //this.chatService.startChatsMonitoring();
+    this.chatService.startChatsMonitoring();
   }
 }

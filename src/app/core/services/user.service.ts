@@ -3,14 +3,34 @@ import { Apollo } from 'apollo-angular';
 import { User } from '../models/user.model';
 import { ALL_USERS_QUERY, AllUsersQuery, GET_USER_BY_ID_QUERY, UserQuery } from './user.graphql';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private apollo: Apollo) { }
+  users$: Observable<User[]>;
+  private usersSubscription: Subscription;
+
+  constructor(
+    private apollo: Apollo
+  ) { }
+
+  startUsersMonitoring(idToExclude: string): void {
+    if (!this.users$) {
+      this.users$ = this.allUsers(idToExclude);
+      this.usersSubscription = this.users$.subscribe();
+    }
+  }
+
+  stopUsersMonitoring(): void {
+    if (this.usersSubscription) {
+      this.usersSubscription.unsubscribe();
+      this.usersSubscription = null;
+      this.users$ = null;
+    }
+  }
 
   allUsers(idToExclude: string):Observable<User[]> {
     return this.apollo.query<AllUsersQuery>({
