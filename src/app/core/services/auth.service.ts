@@ -147,7 +147,6 @@ export class AuthService {
   }
 
   logout(): void {
-    this.apolloConfigModule.closeWebSocketConnection();
     window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
     window.localStorage.removeItem(StorageKeys.KEEP_SIGNED);
     this.keepSigned = false;
