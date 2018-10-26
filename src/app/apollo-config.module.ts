@@ -14,11 +14,14 @@ import { StorageKeys } from "./storage-keys";
 import { persistCache } from "apollo-cache-persist";
 import { WebSocketLink } from "apollo-link-ws";
 import {getOperationAST} from 'graphql';
+import { SubscriptionClient } from "subscriptions-transport-ws";
 
 @NgModule({
   imports: [HttpClientModule, ApolloModule, HttpLinkModule]
 })
 export class ApolloConfigModule {
+  private subscriptionsClient: SubscriptionClient;
+
   constructor(
     private apollo: Apollo,
     @Inject(GRAPHCOOL_CONFIG) private graphcoolConfig: GraphcoolConfig,
@@ -53,6 +56,7 @@ export class ApolloConfigModule {
       }
     });
 
+    this.subscriptionsClient = (<any>ws).subscriptionClient;
     const cache = new InMemoryCache();
 
     persistCache({
@@ -75,6 +79,10 @@ export class ApolloConfigModule {
       cache,
       connectToDevTools: !environment.production
     });
+  }
+
+  closeWebSocketConnection(): void {
+    this.subscriptionsClient.close(true, true);
   }
 
   private getAuthToken(): string {

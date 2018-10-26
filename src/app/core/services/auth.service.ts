@@ -1,3 +1,4 @@
+import { ApolloConfigModule } from "./../../apollo-config.module";
 import { StorageKeys } from "./../../storage-keys";
 import {
   AUTHENTICATE_USER_MUTATION,
@@ -10,31 +11,39 @@ import { Injectable } from "@angular/core";
 import { catchError, map, tap, mergeMap } from "rxjs/operators";
 import { Observable, ReplaySubject, throwError, of } from "rxjs";
 import { Router } from "@angular/router";
-import {Base64} from 'js-base64';
+import { Base64 } from "js-base64";
 import { User } from "../models/user.model";
 
 @Injectable({
   providedIn: "root"
 })
 export class AuthService {
-
   authUser: User;
   retirectURL: string;
   keepSigned: boolean;
   remeberMe: boolean;
   private _isAuthenticated = new ReplaySubject<boolean>(1);
 
-  constructor(private apollo: Apollo, private router:Router) {
+  constructor(
+    private apollo: Apollo,
+    private apolloConfigModule: ApolloConfigModule,
+    private router: Router
+  ) {
     this.isAuthenticated.subscribe(is => console.log("AuthState", is));
     this.init();
     this.validateToken().subscribe(
-      res => console.log('Res', res),
-      err => console.log('Error: ', err));
+      res => console.log("Res", res),
+      err => console.log("Error: ", err)
+    );
   }
 
   init(): void {
-    this.keepSigned = JSON.parse(window.localStorage.getItem(StorageKeys.KEEP_SIGNED));
-    this.remeberMe = JSON.parse(window.localStorage.getItem(StorageKeys.REMEMBER_ME));
+    this.keepSigned = JSON.parse(
+      window.localStorage.getItem(StorageKeys.KEEP_SIGNED)
+    );
+    this.remeberMe = JSON.parse(
+      window.localStorage.getItem(StorageKeys.REMEMBER_ME)
+    );
   }
 
   get isAuthenticated(): Observable<boolean> {
@@ -53,13 +62,14 @@ export class AuthService {
       .pipe(
         map(res => res.data.authenticateUser),
         tap(res =>
-          this.setAuthState({id: res && res.id,
+          this.setAuthState({
+            id: res && res.id,
             token: res && res.token,
             isAuthenticated: res !== null
           })
         ),
         catchError(err => {
-          this.setAuthState({id: null, token: null, isAuthenticated: false });
+          this.setAuthState({ id: null, token: null, isAuthenticated: false });
           return throwError(err);
         })
       );
@@ -85,7 +95,7 @@ export class AuthService {
           })
         ),
         catchError(err => {
-          this.setAuthState({id: null, token: null, isAuthenticated: false });
+          this.setAuthState({ id: null, token: null, isAuthenticated: false });
           return throwError(err);
         })
       );
@@ -93,86 +103,112 @@ export class AuthService {
 
   toggleKeepSigner(): void {
     this.keepSigned = !this.keepSigned;
-    window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
+    window.localStorage.setItem(
+      StorageKeys.KEEP_SIGNED,
+      this.keepSigned.toString()
+    );
   }
 
   toggleRememberMe(): void {
     this.remeberMe = !this.remeberMe;
-    window.localStorage.setItem(StorageKeys.REMEMBER_ME, this.remeberMe.toString());
-    if(!this.remeberMe) {
+    window.localStorage.setItem(
+      StorageKeys.REMEMBER_ME,
+      this.remeberMe.toString()
+    );
+    if (!this.remeberMe) {
       window.localStorage.removeItem(StorageKeys.USER_EMAIL);
       window.localStorage.removeItem(StorageKeys.USER_PASSWORD);
     }
   }
 
-  setRememberMe(user: {email: string, password: string}): void {
-    if(this.remeberMe) {
-      window.localStorage.setItem(StorageKeys.USER_EMAIL, Base64.encode(user.email));
-      window.localStorage.setItem(StorageKeys.USER_PASSWORD, Base64.encode(user.password));
+  setRememberMe(user: { email: string; password: string }): void {
+    if (this.remeberMe) {
+      window.localStorage.setItem(
+        StorageKeys.USER_EMAIL,
+        Base64.encode(user.email)
+      );
+      window.localStorage.setItem(
+        StorageKeys.USER_PASSWORD,
+        Base64.encode(user.password)
+      );
     }
   }
 
-  getRememberMe() : {email: string, password: string}  {
-    if(!this.remeberMe) {
+  getRememberMe(): { email: string; password: string } {
+    if (!this.remeberMe) {
       return null;
     }
     return {
       email: Base64.decode(window.localStorage.getItem(StorageKeys.USER_EMAIL)),
-      password:  Base64.decode(window.localStorage.getItem(StorageKeys.USER_PASSWORD))
-    }
+      password: Base64.decode(
+        window.localStorage.getItem(StorageKeys.USER_PASSWORD)
+      )
+    };
   }
 
   logout(): void {
+    this.apolloConfigModule.closeWebSocketConnection();
     window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
     window.localStorage.removeItem(StorageKeys.KEEP_SIGNED);
     this.keepSigned = false;
     this._isAuthenticated.next(false);
-    this.router.navigate(['/login']);
+    this.router.navigate(["/login"]);
     this.apollo.getClient().resetStore();
   }
 
   autoLogin(): Observable<void> {
-    if(!this.keepSigned) {
+    if (!this.keepSigned) {
       this._isAuthenticated.next(false);
       window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
       return of();
-    } 
-    return this.validateToken().pipe( 
+    }
+    return this.validateToken().pipe(
       tap(authData => {
         const token = window.localStorage.getItem(StorageKeys.AUTH_TOKEN);
         this.setAuthState({
-          id: authData.id, token, isAuthenticated: authData.isAuthenticated
-        });
+          id: authData.id,
+          token,
+          isAuthenticated: authData.isAuthenticated
+        }, true);
       }),
       mergeMap(res => of()),
       catchError(error => {
         this.setAuthState({
-          id: null, token:null, isAuthenticated: false
-        })
+          id: null,
+          token: null,
+          isAuthenticated: false
+        });
         return throwError(error);
       })
     );
   }
 
-  private validateToken() : Observable<{id: string, isAuthenticated: boolean}> {
-    return this.apollo.query<LoggedInUserQuery>({
-      query: LOGGED_IN_USER_QUERY
-    }).pipe(
-      map( res => {
-        const user = res.data.loggedInUser;
-        return {
-          id: user && user.id,
-          isAuthenticated: user !== null
-        }
-      }
-      )
-    );
+  private validateToken(): Observable<{
+    id: string;
+    isAuthenticated: boolean;
+  }> {
+    return this.apollo
+      .query<LoggedInUserQuery>({
+        query: LOGGED_IN_USER_QUERY
+      })
+      .pipe(
+        map(res => {
+          const user = res.data.loggedInUser;
+          return {
+            id: user && user.id,
+            isAuthenticated: user !== null
+          };
+        })
+      );
   }
 
-  private setAuthState(authData: {id: string, token: string, isAuthenticated: boolean }): void {
+  private setAuthState(authData: {id: string; token: string; isAuthenticated: boolean}, isRefresh:boolean = false): void {
     if (authData.isAuthenticated) {
       window.localStorage.setItem(StorageKeys.AUTH_TOKEN, authData.token);
-      this.authUser = {id: authData.id}
+      this.authUser = { id: authData.id };
+      if(!isRefresh) {
+        this.apolloConfigModule.closeWebSocketConnection();
+      }
     }
     this._isAuthenticated.next(authData.isAuthenticated);
   }
