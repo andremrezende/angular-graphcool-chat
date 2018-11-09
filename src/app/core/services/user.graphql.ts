@@ -39,3 +39,19 @@ query GetUserByIdQuery($userId: ID!)  {
 }
 ${UserFragment}
 `;
+
+export const NEW_USERS_SUBSCRIPTION = gql`
+  subscription NewUsersSubscription {
+    User (
+      filter: {
+        mutation_in [CREATED]
+      }
+    ) {
+      mutation
+      node {
+        ...UserFragment
+      }
+    }
+  }
+  ${UserFragment}
+`;
