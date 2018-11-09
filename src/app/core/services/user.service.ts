@@ -40,7 +40,8 @@ export class UserService {
       query: ALL_USERS_QUERY,
       variables: {
         idToExclude
-      }
+      },
+      fetchPolicy: 'network-only'
     });
     this.queryRef.subscribeToMore({
       document: NEW_USERS_SUBSCRIPTION,
