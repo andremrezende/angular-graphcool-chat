@@ -63,7 +63,7 @@ export class ChatService extends BaseService {
     this.subscriptions = [];
     this.chats$ = null;
   }
-
+  
   getUserChats(): Observable<Chat[]> {
     this.queryRef = this.apollo.watchQuery<AllChatsQuery>({
       query: USER_CHATS_QUERY,
@@ -285,8 +285,4 @@ export class ChatService extends BaseService {
       .pipe(map(res => res.data.createChat));
   }
 
-  private onDestroy(): void {
-    this.subscriptions.forEach(s => s.unsubscribe);
-    this.subscriptions = [];
-  }
 }
