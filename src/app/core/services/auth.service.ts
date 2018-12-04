@@ -149,6 +149,8 @@ export class AuthService {
   logout(): void {
     window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
     window.localStorage.removeItem(StorageKeys.KEEP_SIGNED);
+    //Apaga cache após usuario fazer logout
+    this.apolloConfigModule.cachePersistor.purge();
     this.keepSigned = false;
     this._isAuthenticated.next(false);
     this.router.navigate(["/login"]);
@@ -188,7 +190,8 @@ export class AuthService {
   }> {
     return this.apollo
       .query<LoggedInUserQuery>({
-        query: LOGGED_IN_USER_QUERY
+        query: LOGGED_IN_USER_QUERY,
+        fetchPolicy: 'network-only'
       })
       .pipe(
         map(res => {
@@ -197,7 +200,8 @@ export class AuthService {
             id: user && user.id,
             isAuthenticated: user !== null
           };
-        })
+        }),
+        mergeMap(authData => (authData.isAuthenticated ? of(authData) : throwError(new Error('Invalid token!'))))
       );
   }
 

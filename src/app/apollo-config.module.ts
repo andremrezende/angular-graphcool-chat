@@ -11,7 +11,7 @@ import { HttpLinkModule, HttpLink } from "apollo-angular-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { onError } from "apollo-link-error";
 import { StorageKeys } from "./storage-keys";
-import { persistCache } from "apollo-cache-persist";
+import { CachePersistor } from "apollo-cache-persist";
 import { WebSocketLink } from "apollo-link-ws";
 import {getOperationAST} from 'graphql';
 import { SubscriptionClient } from "subscriptions-transport-ws";
@@ -20,6 +20,7 @@ import { SubscriptionClient } from "subscriptions-transport-ws";
   imports: [HttpClientModule, ApolloModule, HttpLinkModule]
 })
 export class ApolloConfigModule {
+  cachePersistor: CachePersistor<any>;
   private subscriptionsClient: SubscriptionClient;
 
   constructor(
@@ -58,12 +59,10 @@ export class ApolloConfigModule {
 
     this.subscriptionsClient = (<any>ws).subscriptionClient;
     const cache = new InMemoryCache();
-
-    persistCache({
+    
+    this.cachePersistor = new CachePersistor({
       cache,
       storage: window.localStorage
-    }).catch(err => {
-      console.log("Error while perssiting cache: ", err);
     });
 
     apollo.create({
