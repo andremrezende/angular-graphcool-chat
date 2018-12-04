@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
       .pipe(take(1))
       .subscribe(null, error => {
         const message = this.errorService.getErrorMessage(error);
-        this.snackBar.open(`Unexpected error: ${message}`, "Done", {
+        this.snackBar.open(`Error: ${message}`, "Done", {
           duration: 5000,
           verticalPosition: "top"
         });
